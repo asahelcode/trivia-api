@@ -38,6 +38,8 @@ def create_app(test_config=None):
                              'Content-Type,Authorization,true')
         response.headers.add('Access-Control-Allow-Methods',
                              'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        
         return response
     '''
   Create an endpoint to handle GET requests
@@ -68,7 +70,7 @@ def create_app(test_config=None):
   '''
     @app.route('/questions')
     def retrieve_questions():
-        selection = Question.query.order_by(Question.id).all()
+        selection = Question.query.all()
         current_questions = paginate_questions(request, selection)
 
         categories = Category.query.order_by(Category.type).all()
@@ -89,7 +91,7 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
-    @app.route("/questions/<question_id>", methods=['DELETE'])
+    @app.route("/questions/<int:question_id>", methods=['DELETE'])
     def delete_question(question_id):
         try:
             question = Question.query.get(question_id)
@@ -171,8 +173,7 @@ def create_app(test_config=None):
     def retrieve_questions_by_category(category_id):
 
         try:
-            questions = Question.query.filter(
-                Question.category == str(category_id)).all()
+            questions = Question.query.filter_by(str(category_id)).all()
 
             return jsonify({
                 'success': True,
